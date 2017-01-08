@@ -1,6 +1,7 @@
 from openrave.models import Robot
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 import openravepy
 import StringIO
@@ -20,15 +21,17 @@ def index(request):
 	env.Destroy()
 	return HttpResponse(resp)
 
+@csrf_exempt
 def add(request,robot_name=''):
 	if not robot_name:
 		return HttpResponse("robot_name is empty")
 	if any(e.name==robot_name for e in Robot.objects.all()):
 		return HttpResponse("robot_name %s already exists")
 	try:
-		robot_file=request.GET['file']
+		robot_file=request.POST['file']
 		q=Robot.create(robot_name,robot_file)
-		return HttpResponse("added [%s]"%robot_file)
+		q.save()
+		return HttpResponse("added [%s]"%robot_name)
 	except KeyError:
 		return HttpResponse("file param not specified")
 
