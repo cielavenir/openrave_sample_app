@@ -14,7 +14,9 @@ def remove_robot(host,robot_name):
 
 if __name__=='__main__':
 	if len(sys.argv)<4:
-		sys.stderr.write("script host[:port] robot_name [filepath|--remove]\n")
+		sys.stderr.write("script host[:port] robot_name [filepath.xml|--remove]\n")
+		sys.stderr.write("note: filepath.xml must be complete.\n")
+		sys.stderr.write("If it includes something else, use `openrave -save complete.xml partial.xml` prior.\n")
 		sys.exit(1)
 	host=sys.argv[1]
 	robot_name=sys.argv[2]
