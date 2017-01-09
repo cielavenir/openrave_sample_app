@@ -15,14 +15,17 @@ class RobotTest(TestCase):
 	def test_add_and_remove(self):
 		response=self.client.get('/')
 		self.failUnlessEqual(response.status_code,200)
+		self.failUnlessEqual(BeautifulSoup(response.content).find(id='num_robots').text,"0")
 		response=self.client.post('/add/test_add_and_remove',{'file':TRIDOF})
 		self.failUnlessEqual(response.status_code,200)
 		response=self.client.get('/')
 		self.failUnlessEqual(response.status_code,200)
+		self.failUnlessEqual(BeautifulSoup(response.content).find(id='num_robots').text,"1")
 		response=self.client.post('/remove/test_add_and_remove')
 		self.failUnlessEqual(response.status_code,200)
 		response=self.client.get('/')
 		self.failUnlessEqual(response.status_code,200)
+		self.failUnlessEqual(BeautifulSoup(response.content).find(id='num_robots').text,"0")
 		response=self.client.post('/remove/test_add_and_remove')
 		self.failUnlessEqual(response.status_code,404)
 	def test_remove_invalid(self):
