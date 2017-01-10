@@ -8,6 +8,7 @@ import base64
 import StringIO
 
 def array2URL(data):
+	import PIL ###
 	mode = 'RGB'
 	size = data.shape[1],data.shape[0]
  	img = PIL.Image.frombuffer(mode, size, data.tostring(), 'raw', mode, 0, 1)
@@ -27,7 +28,6 @@ def index(request):
 			robot=env.GetRobots()[0]
 			robot_info="[%s] %s, jobs=%d"%(e.name,robot.GetName(),robot.GetDOF())
 			try:
-				import PIL.Image ###
 				I=env.GetViewer().GetCameraImage(640,480,env.GetViewer().GetCameraTransform(),[640,640,320,240])
 				robot_image='<li><img src="'+array2URL(I)+'"></li>'
 			except:
