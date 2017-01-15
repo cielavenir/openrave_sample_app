@@ -23,7 +23,7 @@ def index(request):
 	robots=Robot.objects.all()
 	robots_for_render=[]
 	env=openravepy.Environment()
-	#env.SetViewer('qtcoin')
+	env.SetViewer('qtcoin')
 	with env:
 		for e in robots:
 			env.LoadData(e.file)
