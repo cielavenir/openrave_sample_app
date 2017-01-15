@@ -71,10 +71,10 @@ def add(request,robot_name=''):
 				q.save()
 		except IndexError:
 			env.Destroy()
-			return HttpResponseBadRequest("robot xml is invalid\n")
+			return HttpResponseBadRequest("robot xml is invalid (note: 'include' must be resolved)\n")
 		except openravepy.openravepy_ext.openrave_exception:
 			env.Destroy()
-			return HttpResponseBadRequest("robot xml is invalid\n")
+			return HttpResponseBadRequest("robot xml is invalid (note: 'include' must be resolved)\n")
 		env.Destroy()
 		return HttpResponse("added [%s]\n"%robot_name)
 	except KeyError:
