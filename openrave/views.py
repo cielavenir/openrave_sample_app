@@ -4,8 +4,9 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 import openravepy
-import base64
+import base64,time
 import StringIO
+import sys
 
 def array2URL(data):
 	import PIL ###
@@ -22,6 +23,7 @@ def index(request):
 	robots=Robot.objects.all()
 	robots_for_render=[]
 	env=openravepy.Environment()
+	env.SetViewer('qtcoin')
 	with env:
 		for e in robots:
 			env.LoadData(e.file)
@@ -30,7 +32,9 @@ def index(request):
 			try:
 				I=env.GetViewer().GetCameraImage(640,480,env.GetViewer().GetCameraTransform(),[640,640,320,240])
 				robot_image='<li><img src="'+array2URL(I)+'"></li>'
-			except:
+			except Exception as detail:
+				sys.stderr.write(str(type(detail))+"\n")
+				sys.stderr.write(str(detail)+"\n")
 				robot_image=''
 			env.Remove(robot)
 			robots_for_render.append({'info':robot_info,'image':robot_image})
