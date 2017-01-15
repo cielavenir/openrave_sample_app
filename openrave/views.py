@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 import openravepy
-import base64,time
+import base64,time,json
 import StringIO
 import sys
 
@@ -18,20 +18,27 @@ def array2URL(data):
 	return 'data:image/png;base64,'+base64.b64encode(buf.getvalue())
 
 # Create your views here.
-def index(request):
+def index(request,f_json=False):
 	resp=StringIO.StringIO()
 	robots=Robot.objects.all()
 	robots_for_render=[]
 	env=openravepy.Environment()
-	env.SetViewer('qtcoin')
+	#unfortunately this causes "core dump"
+	#env.SetViewer('qtcoin')
 	with env:
 		for e in robots:
 			env.LoadData(e.file)
 			robot=env.GetRobots()[0]
-			robot_info="[%s] %s, jobs=%d"%(e.name,robot.GetName(),robot.GetDOF())
+			if f_json:
+				robot_info={'id':e.name,'name':robot.GetName(),'jobs':robot.GetDOF()}
+			else:
+				robot_info="[%s] %s, jobs=%d"%(e.name,robot.GetName(),robot.GetDOF())
 			try:
 				I=env.GetViewer().GetCameraImage(640,480,env.GetViewer().GetCameraTransform(),[640,640,320,240])
-				robot_image='<li><img src="'+array2URL(I)+'"></li>'
+				if f_json:
+					robot_image=array2URL(I)
+				else:
+					robot_image='<li><img src="'+array2URL(I)+'"></li>'
 			except Exception as detail:
 				sys.stderr.write(str(type(detail))+"\n")
 				sys.stderr.write(str(detail)+"\n")
@@ -39,7 +46,13 @@ def index(request):
 			env.Remove(robot)
 			robots_for_render.append({'info':robot_info,'image':robot_image})
 	env.Destroy()
-	return render(request,'index.html',{'num_robots':len(robots),'robots':robots_for_render})
+	if f_json:
+		return HttpResponse(json.dumps(robots_for_render))
+	else:
+		return render(request,'index.html',{'num_robots':len(robots),'robots':robots_for_render})
+
+def info(request):
+	return index(request,True)
 
 @csrf_exempt
 def add(request,robot_name=''):
