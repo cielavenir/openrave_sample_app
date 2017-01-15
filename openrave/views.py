@@ -23,7 +23,7 @@ def index(request):
 	robots=Robot.objects.all()
 	robots_for_render=[]
 	env=openravepy.Environment()
-	env.SetViewer('qtcoin')
+	#env.SetViewer('qtcoin')
 	with env:
 		for e in robots:
 			env.LoadData(e.file)
@@ -49,8 +49,20 @@ def add(request,robot_name=''):
 		return HttpResponseForbidden("robot_name %s already exists\n"%robot_name)
 	try:
 		robot_file=request.POST['file']
-		q=Robot.create(robot_name,robot_file)
-		q.save()
+		try:
+			env=openravepy.Environment()
+			with env:
+				env.LoadData(robot_file)
+				robot=env.GetRobots()[0]
+				q=Robot.create(robot_name,robot_file)
+				q.save()
+		except IndexError:
+			env.Destroy()
+			return HttpResponseBadRequest("robot xml is invalid\n")
+		except openravepy.openravepy_ext.openrave_exception:
+			env.Destroy()
+			return HttpResponseBadRequest("robot xml is invalid\n")
+		env.Destroy()
 		return HttpResponse("added [%s]\n"%robot_name)
 	except KeyError:
 		return HttpResponseBadRequest("file param not specified\n")

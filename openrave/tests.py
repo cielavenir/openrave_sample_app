@@ -19,6 +19,9 @@ class RobotTest(TestCase):
 	def test_add_no_file(self):
 		response=self.client.post('/add/test_no_file',{})
 		self.failUnlessEqual(response.status_code,400)
+	def test_add_invalid_file(self):
+		response=self.client.post('/add/test_invalid_file',{'file':'invalid'})
+		self.failUnlessEqual(response.status_code,400)
 	def test_add_and_remove(self):
 		response=self.client.get('/')
 		self.failUnlessEqual(response.status_code,200)
