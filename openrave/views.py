@@ -2,6 +2,7 @@ from openrave.models import Robot
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from . import openrave_env
 
 import openravepy
 import base64,time,json
@@ -22,19 +23,16 @@ def index(request,f_json=False):
 	resp=StringIO.StringIO()
 	robots=Robot.objects.all()
 	robots_for_render=[]
-	env=openravepy.Environment()
-	#unfortunately this causes "core dump"
-	#env.SetViewer('qtcoin')
-	with env:
+	with openrave_env:
 		for e in robots:
-			env.LoadData(e.file)
-			robot=env.GetRobots()[0]
+			openrave_env.LoadData(e.file)
+			robot=openrave_env.GetRobots()[0]
 			if f_json:
 				robot_info={'id':e.name,'name':robot.GetName(),'jobs':robot.GetDOF()}
 			else:
 				robot_info="[%s] %s, jobs=%d"%(e.name,robot.GetName(),robot.GetDOF())
 			try:
-				I=env.GetViewer().GetCameraImage(640,480,env.GetViewer().GetCameraTransform(),[640,640,320,240])
+				I=openrave_env.GetViewer().GetCameraImage(640,480,openrave_env.GetViewer().GetCameraTransform(),[640,640,320,240])
 				if f_json:
 					robot_image=array2URL(I)
 				else:
@@ -43,9 +41,8 @@ def index(request,f_json=False):
 				sys.stderr.write(str(type(detail))+"\n")
 				sys.stderr.write(str(detail)+"\n")
 				robot_image=''
-			env.Remove(robot)
+			openrave_env.Remove(robot)
 			robots_for_render.append({'info':robot_info,'image':robot_image})
-	env.Destroy()
 	if f_json:
 		return HttpResponse(json.dumps(robots_for_render))
 	else:
@@ -84,4 +81,3 @@ def remove(request,robot_name=''):
 	q=get_object_or_404(Robot,name=robot_name)
 	q.delete()
 	return HttpResponse("removed [%s]\n"%robot_name)
-
