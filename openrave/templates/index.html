@@ -3,6 +3,6 @@
 <ul>
 <li><span id="num_robots">{{ num_robots }}</span> robots</li>
 {% for e in robots %}
-<li>{{ e.info }}</li>{{ e.image }}
+<li>{{ e.info }}</li>{% autoescape off %}{{ e.image }}{% endautoescape %}
 {% endfor %}
 </ul></body></html>
