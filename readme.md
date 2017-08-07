@@ -1,3 +1,5 @@
+- This repository is part of https://github.com/cielavenir/mujin_recruiting .
+
 - OpenRAVE app on Django 1.7.11 (jessie) / 1.10.7 (stretch)
 
 ## Endpoints
