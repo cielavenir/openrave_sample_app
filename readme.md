@@ -1,4 +1,4 @@
-- OpenRAVE app on Django 1.7.11 (jessie)
+- OpenRAVE app on Django 1.7.11 (jessie) / 1.10.7 (stretch)
 
 ## Endpoints
 
@@ -11,3 +11,6 @@
 - GET /remove/ROBOT_NAME
   - remove robot
 
+## Screenshot
+
+![app image](http://i.imgur.com/g6JGsgq.png)
